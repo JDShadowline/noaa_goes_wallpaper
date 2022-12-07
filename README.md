@@ -17,3 +17,7 @@ The script will run in the background and automatically update your wallpaper ev
 License
 
 This program is licensed under the MIT License. For more information, see the LICENSE file.
+
+## TODO
+
+It is currently not required to save each of the images to a folder. The original idea was to use these for a high quality animation but we can also just get the lastest n amount from the NOAA url to create that on the fly.
