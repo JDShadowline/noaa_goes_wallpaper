@@ -25,8 +25,9 @@ current_dir = os.getcwd()
 script_dir = os.path.dirname(os.path.abspath(__file__))
 images_path = os.path.join(script_dir,"images")
 
+# Variable to change the maximum stored images.
+max_allowed_images = 120
 
-running = False
 
 
 ######################### FUNCTIONS
@@ -52,7 +53,7 @@ def animation_maker():
     # The third and fourth arguments are the frame size of the video
     # It is important to match the input frame size to the output frame size.
     # The fifth argument is the frames per second
-    output = cv2.VideoWriter("animation0.avi", cv2.VideoWriter_fourcc(*"MJPG"), 30, (5000,3000))
+    output = cv2.VideoWriter("animation0.avi", cv2.VideoWriter_fourcc(*"MJPG"), 10, (5000,3000))
     
     # Loop through all the images in the folder
     files = os.listdir(images_path)
@@ -69,6 +70,18 @@ def animation_maker():
     
     # Release the VideoWriter object
     output.release()
+    
+def trim_images():
+    files = os.listdir(images_path)
+    # If the number of files in the directory is greater than the maximum allowed,
+    # trim the oldest files until the number of files is equal to the maximum
+    while len(files) > max_allowed_images:
+        # Get the oldest file in the directory
+        oldest_file = min(files, key=lambda f: os.path.getmtime(os.path.join(images_path, f)))
+        # Delete the oldest file
+        os.remove(os.path.join(images_path, oldest_file))
+        # Update the list of files in the directory
+        files = os.listdir(images_path)
     
 def get_noaa_goes_image():
     ## Set current time, +0 GMT (-6 est)
@@ -104,6 +117,8 @@ def main():
         if time.strftime("%M", time.gmtime()) == "00" or time.strftime("%M", time.gmtime()) == "15" or time.strftime("%M", time.gmtime()) == "30" or time.strftime("%M", time.gmtime()) == "45":
             print("Ding! Downloading a new image.")
             set_windows_wallpaper(get_noaa_goes_image())
+            # Trim out any old images outside of our set amount
+            trim_images()
 
             # Sleep the script for another 15 minutes
             time.sleep(60 * 15)
@@ -119,6 +134,7 @@ def main():
 ######################### MAIN
 
 if __name__ == "__main__":
+    
     main()
     # animation_maker()
     # testvideo()
