@@ -31,6 +31,45 @@ running = False
 
 ######################### FUNCTIONS
 
+def testvideo():
+    import cv2, numpy as np
+    writer = cv2.VideoWriter("output.avi", cv2.VideoWriter_fourcc(*"MJPG"), 30,(640,480))
+
+    for frame in range(1000):
+        # Create some static
+        writer.write(np.random.randint(0, 255, (480,640,3)).astype('uint8'))
+
+    writer.release()
+
+def animation_maker():
+    import cv2
+    from tqdm import tqdm
+
+  
+    # Create a VideoWriter object
+    # The first argument is the file name of the video to be created
+    # The second argument is the FourCC code, which specifies the codec to be used
+    # The third and fourth arguments are the frame size of the video
+    # It is important to match the input frame size to the output frame size.
+    # The fifth argument is the frames per second
+    output = cv2.VideoWriter("animation0.avi", cv2.VideoWriter_fourcc(*"MJPG"), 30, (5000,3000))
+    
+    # Loop through all the images in the folder
+    files = os.listdir(images_path)
+    for file in tqdm(files, desc="Processing image animation", total=len(files)):
+    
+    # Loop through all the files in the sorted list
+    # for file in files:
+        # Load the image
+        # print(file)
+        img = cv2.imread(os.path.join(images_path, file))
+
+        # Write the image to the output video file
+        output.write(img.astype('uint8'))
+    
+    # Release the VideoWriter object
+    output.release()
+    
 def get_noaa_goes_image():
     ## Set current time, +0 GMT (-6 est)
     current_time = time.strftime("%Y%m%d_%H%M", time.gmtime())
@@ -65,10 +104,15 @@ def main():
         if time.strftime("%M", time.gmtime()) == "00" or time.strftime("%M", time.gmtime()) == "15" or time.strftime("%M", time.gmtime()) == "30" or time.strftime("%M", time.gmtime()) == "45":
             print("Ding! Downloading a new image.")
             set_windows_wallpaper(get_noaa_goes_image())
-            
+
             # Sleep the script for another 15 minutes
             time.sleep(60 * 15)
-
+        if time.strftime("%M", time.gmtime()) == "00":
+            # Create an animation with this new image every hour
+            try:
+                animation_maker()
+            except:
+                pass
         ## Sleep the script until the above is true
         time.sleep(30)
 
@@ -76,6 +120,5 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
+    # animation_maker()
+    # testvideo()
